@@ -9,7 +9,10 @@
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "infoPlist": {
+        "NSCameraUsageDescription": "This app uses the camera to scan QR codes for event check-in."
+      }
     },
     "android": {
       "softwareKeyboardLayoutMode": "resize",
@@ -18,6 +21,7 @@
         "backgroundColor": "#ffffff"
       },
       "edgeToEdgeEnabled": true,
+      "permissions": ["CAMERA"],
       "package": "com.jaisurya2325.EventApp"
     },
     "web": {
@@ -36,7 +40,12 @@
           "backgroundColor": "#ffffff"
         }
       ],
-      "expo-barcode-scanner"
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "Allow access to your camera to scan QR codes."
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true

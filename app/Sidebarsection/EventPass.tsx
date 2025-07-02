@@ -51,6 +51,7 @@ export default function EventPass() {
 const styles = StyleSheet.create({
   container: {
     padding: 16,
+    paddingTop:70,
     backgroundColor: '#f3f4f6',
   },
   card: {

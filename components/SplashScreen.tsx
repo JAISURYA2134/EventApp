@@ -1,54 +1,89 @@
-import React, { useEffect } from 'react';
-import { View, Image, StyleSheet, ActivityIndicator, Text } from 'react-native';
+import React, { useEffect, useRef } from 'react';
+import {
+  View,
+  Image,
+  Text,
+  Animated,
+  Easing,
+  StatusBar,
+  StyleSheet,
+} from 'react-native';
 
 interface SplashScreenProps {
   onComplete: () => void;
 }
 
 const SplashScreen: React.FC<SplashScreenProps> = ({ onComplete }) => {
+  const opacity = useRef(new Animated.Value(0)).current;
+  const scaleX = useRef(new Animated.Value(0.3)).current; // width scale like wipe
+
   useEffect(() => {
-    const timer = setTimeout(() => {
+    StatusBar.setHidden(true); // Full screen with no status bar
+
+    Animated.parallel([
+      Animated.timing(opacity, {
+        toValue: 1,
+        duration: 1800,
+        easing: Easing.out(Easing.exp),
+        useNativeDriver: true,
+      }),
+      Animated.timing(scaleX, {
+        toValue: 1,
+        duration: 1800,
+        easing: Easing.out(Easing.exp),
+        useNativeDriver: true,
+      }),
+    ]).start();
+
+    const timeout = setTimeout(() => {
       onComplete();
     }, 3000);
 
-    return () => clearTimeout(timer);
+    return () => clearTimeout(timeout);
   }, []);
 
   return (
-    <View style={styles.container}>
-      <Image
-        source={require('@/assets/images/logo.png')} // ✅ Update this path as needed
-        style={styles.logo}
-        resizeMode="contain"
-      />
-      <Text style={styles.title}>Vellalar Welfare Society</Text>
-      <ActivityIndicator size="large" color="#119822" style={styles.loader} />
+    <View style={styles.fullScreen}>
+      <Animated.View
+        style={[
+          styles.logoContainer,
+          {
+            opacity,
+            transform: [{ scaleX }],
+          },
+        ]}
+      >
+        <Image
+          source={require('@/assets/images/logo.png')}
+          style={styles.logo}
+          resizeMode="contain"
+        />
+        <Text style={styles.title}>Vellalar Welfare Society</Text>
+      </Animated.View>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
+  fullScreen: {
     flex: 1,
-    backgroundColor: '#fff', // White background
+    backgroundColor: '#FFFFFF',
     justifyContent: 'center',
     alignItems: 'center',
-    padding: 24,
+  },
+  logoContainer: {
+    alignItems: 'center',
   },
   logo: {
-    width: 200,
-    height: 200,
-    marginBottom: 16,
+    width: 220,
+    height: 220,
+    marginBottom: 20,
   },
   title: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#000',
+    fontSize: 22,
+    fontWeight: '700',
+    color: '#4a2e00',
     textAlign: 'center',
-    marginBottom: 16,
-  },
-  loader: {
-    marginTop: 8,
   },
 });
 

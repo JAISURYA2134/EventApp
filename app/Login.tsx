@@ -1,3 +1,4 @@
+
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image } from 'react-native';
 import { useState } from 'react';
 import { useAppStore } from '@/lib/store';
@@ -29,14 +30,19 @@ export default function LoginScreen() {
       const querySnapshot = await getDocs(q);
 
       if (!querySnapshot.empty) {
-        const userData = querySnapshot.docs[0].data();
+        const docSnap = querySnapshot.docs[0];
+const userData = docSnap.data();
+const userId = docSnap.id;
 
         // Set user globally
-        useAppStore.getState().setUser({
-          name: userData.name,
-          email: userData.email,
-          isVerified: userData.isVerified ?? false,
-        });
+// Set user globally
+useAppStore.getState().setUser({
+  id:userId,
+  name: userData.name,
+  email: userData.email,
+  isVerified: userData.isVerified ?? false,
+  isAdmin: userData.email === 'admin@gmail.com' && password === 'admin1', // ✅ Admin check
+});
 
         router.replace('/sidebar'); // Navigate to home screen
       } else {
@@ -119,8 +125,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   logo: {
-    width: 100,
-    height: 100,
+    width: 200,
+    height: 140,
     marginBottom: 16,
     justifyContent: 'center',
   },
@@ -132,7 +138,7 @@ const styles = StyleSheet.create({
   subtitle: {
     fontSize: 14,
     textAlign: 'center',
-    color: '#6b7280',
+    color: '#2e7d32',
     marginBottom: 20,
   },
   inputWrapper: {
@@ -146,7 +152,7 @@ const styles = StyleSheet.create({
   },
   icon: {
     marginRight: 8,
-    color: '#9ca3af',
+    color: '#2e7d32',
   },
   input: {
     flex: 1,
@@ -154,7 +160,7 @@ const styles = StyleSheet.create({
     color: '#000',
   },
   button: {
-    backgroundColor: '#119822',
+    backgroundColor: '#2e7d32',
     paddingVertical: 12,
     borderRadius: 10,
     marginTop: 12,
@@ -172,7 +178,7 @@ const styles = StyleSheet.create({
     marginTop: 12,
   },
   signupLink: {
-    color: '#119822',
+    color: '#2e7d32',
     fontWeight: 'bold',
   },
   errorText: {

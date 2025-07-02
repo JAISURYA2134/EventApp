@@ -6,20 +6,19 @@ import {
   TouchableOpacity,
   StyleSheet,
   ScrollView,
-  Dimensions,
 } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import { useAppStore } from '@/lib/store';
-import { Section} from '@/lib/types';
+import { Section } from '@/lib/types';
 import { useRouter } from 'expo-router';
-import EventRegistration from './Sidebarsection/EventRegistration'
+import EventRegistration from './Sidebarsection/EventRegistration';
 import AboutUs from './Sidebarsection/AboutUs';
 import Profile from './Sidebarsection/Profile';
 import Vision from './Sidebarsection/Vision';
 import Home from './Sidebarsection/Home';
 import EventPass from './Sidebarsection/EventPass';
 import QRScanner from './Sidebarsection/QRScanner';
-
+import AttendanceList from './Sidebarsection/AttendanceList';
 
 type FeatherIconName =
   | 'home'
@@ -28,42 +27,57 @@ type FeatherIconName =
   | 'info'
   | 'user'
   | 'clipboard'
+  | 'bar-chart-2';
 
-  // | 'bar-chart-2';
-
-const navItems: { icon: FeatherIconName; label: string; section: Section }[] = [
+const baseNavItems: { icon: FeatherIconName; label: string; section: Section }[] = [
   { icon: 'home', label: 'Home', section: 'home' },
   { icon: 'calendar', label: 'Event Registration', section: 'event-registration' },
-  { icon: 'calendar', label: 'QR Scanner', section: 'qrscanner' },
   { icon: 'clipboard', label: 'Event Pass', section: 'eventpass' },
   { icon: 'eye', label: 'Vision', section: 'vision' },
   { icon: 'info', label: 'About Us', section: 'about-us' },
   { icon: 'user', label: 'My Profile', section: 'profile' },
-  // { icon: 'bar-chart-2', label: 'Attendance', section: 'attendance' },
+];
+
+const adminOnlyNavItems: { icon: FeatherIconName; label: string; section: Section }[] = [
+  { icon: 'bar-chart-2', label: 'Attendance List', section: 'attendance' },
+  { icon: 'calendar', label: 'QR Scanner', section: 'qrscanner' },
 ];
 
 const SIDEBAR_WIDTH = 260;
-
-const renderSection = (section: Section) => {
-  switch (section) {
-    case 'home': return <Home />;
-    case 'event-registration': return <EventRegistration />;
-    case 'qrscanner':return <QRScanner/>;
-    case 'eventpass': return <EventPass/>;
-    case 'vision': return <Vision />;
-    case 'about-us': return <AboutUs />;
-    case 'profile': return <Profile />;
-    default: return <Text>Unknown section</Text>;
-  }
-};
-
 
 export default function Sidebar() {
   const { currentSection, setCurrentSection, user, logout } = useAppStore();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const sidebarX = useRef(new Animated.Value(-SIDEBAR_WIDTH)).current;
-
   const router = useRouter();
+
+  const navItems = user?.isAdmin
+    ? [...baseNavItems, ...adminOnlyNavItems]
+    : baseNavItems;
+
+  const renderSection = (section: Section) => {
+    if (!user?.isAdmin && (section === 'attendance' || section === 'qrscanner')) {
+      return (
+        <View style={{ padding: 20 }}>
+          <Text style={{ color: '#dc2626', fontWeight: 'bold' }}>
+            Access Denied: Admins only
+          </Text>
+        </View>
+      );
+    }
+
+    switch (section) {
+      case 'home': return <Home />;
+      case 'event-registration': return <EventRegistration />;
+      case 'qrscanner': return <QRScanner />;
+      case 'eventpass': return <EventPass />;
+      case 'vision': return <Vision />;
+      case 'about-us': return <AboutUs />;
+      case 'profile': return <Profile />;
+      case 'attendance': return <AttendanceList />;
+      default: return <Text>Unknown section</Text>;
+    }
+  };
 
   const toggleSidebar = () => {
     const toValue = isSidebarOpen ? -SIDEBAR_WIDTH : 0;
@@ -84,9 +98,8 @@ export default function Sidebar() {
     <View style={styles.container}>
       {/* Sidebar Panel */}
       <Animated.View style={[styles.sidebar, { left: sidebarX }]}>
-        {/* Sidebar Menu Button (inside sidebar) */}
         <TouchableOpacity onPress={toggleSidebar} style={styles.menuButtonInside}>
-          <Feather name="menu" size={24} color="#119822" />
+          <Feather name="menu" size={24} color="#2e7d32" />
         </TouchableOpacity>
 
         <ScrollView style={styles.navMenu}>
@@ -105,33 +118,25 @@ export default function Sidebar() {
           })}
         </ScrollView>
 
-        <View style={styles.userCard}>
-          <View style={styles.avatar}>
-            <Text style={styles.avatarText}>{user?.name?.charAt(0).toUpperCase() || 'U'}</Text>
-          </View>
-          <View style={styles.userDetails}>
-            <Text style={styles.userName}>{user?.name || 'Guest User'}</Text>
-            <Text style={styles.userStatus}>{user?.isVerified ? 'Verified' : 'Not Verified'}</Text>
-          </View>
-            <TouchableOpacity
-            onPress={() => {
-                logout(); // clear user state
-                router.replace('/Login'); // route to the login screen
-            }}
-            >
-            <Feather name="log-out" size={18} color="#9CA3AF" />
-            </TouchableOpacity>
-        </View>
+        {/* Logout Button at Bottom */}
+        <TouchableOpacity
+          onPress={() => {
+            logout();
+            router.replace('/Login');
+          }}
+          style={styles.logoutButton}
+        >
+          <Feather name="log-out" size={18} color="#9CA3AF" />
+          <Text style={styles.logoutText}>Logout</Text>
+        </TouchableOpacity>
       </Animated.View>
 
-      {/* Global Menu Button (only when sidebar is closed) */}
       {!isSidebarOpen && (
         <TouchableOpacity onPress={toggleSidebar} style={styles.menuButtonOutside}>
-          <Feather name="menu" size={24} color="#119822" />
+          <Feather name="menu" size={24} color="#2e7d32" />
         </TouchableOpacity>
       )}
 
-      {/* Backdrop */}
       {isSidebarOpen && (
         <TouchableOpacity
           onPress={toggleSidebar}
@@ -141,9 +146,9 @@ export default function Sidebar() {
       )}
 
       {/* Main Content */}
-<View style={styles.mainContent}>
-  {renderSection(currentSection)}
-</View>
+      <View style={styles.mainContent}>
+        {renderSection(currentSection)}
+      </View>
     </View>
   );
 }
@@ -151,23 +156,20 @@ export default function Sidebar() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f0fdf4',
+    backgroundColor: '#ffffff',
     position: 'relative',
   },
-
-  // menu icon when sidebar is closed
   menuButtonOutside: {
     position: 'absolute',
     top: 20,
-    left: 20,
+    left: 12,
     zIndex: 25,
     backgroundColor: 'white',
     padding: 8,
     borderRadius: 8,
     elevation: 5,
+    
   },
-
-  // menu icon inside sidebar
   menuButtonInside: {
     marginBottom: 16,
     backgroundColor: '#f3f4f6',
@@ -175,7 +177,6 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     alignSelf: 'flex-start',
   },
-
   sidebar: {
     position: 'absolute',
     top: 0,
@@ -192,7 +193,6 @@ const styles = StyleSheet.create({
     shadowRadius: 6,
     elevation: 8,
   },
-
   backdrop: {
     position: 'absolute',
     top: 0,
@@ -202,11 +202,10 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0,0,0,0.2)',
     zIndex: 10,
   },
-
   navMenu: {
     flexGrow: 1,
+    color:'#2e7d32',
   },
-
   navItem: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -222,58 +221,29 @@ const styles = StyleSheet.create({
     color: '#6B7280',
   },
   activeNavItem: {
-    backgroundColor: '#119822',
+    backgroundColor: 'rgba(16, 82, 48, 0.8)',
   },
   activeNavText: {
     color: 'white',
     fontWeight: 'bold',
   },
-
-  userCard: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#F3F4F6',
-    padding: 12,
-    borderRadius: 12,
-    marginTop: 16,
-  },
-  avatar: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    backgroundColor: '#119822',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  avatarText: {
-    color: 'white',
-    fontWeight: 'bold',
-  },
-  userDetails: {
-    flex: 1,
-    marginLeft: 10,
-  },
-  userName: {
-    fontSize: 14,
-    fontWeight: '600',
-  },
-  userStatus: {
-    fontSize: 12,
-    color: '#6B7280',
-  },
   mainContent: {
     flex: 1,
-    justifyContent: 'center',
-    paddingHorizontal: 24,
-    paddingTop: 80,
+    paddingHorizontal: 0,
+    paddingTop: 0,
   },
-  mainTitle: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    marginBottom: 12,
+  logoutButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 20,
+    padding: 12,
+    borderRadius: 8,
+    backgroundColor: '#f3f4f6',
+    justifyContent: 'flex-start',
   },
-  mainSubtitle: {
-    fontSize: 16,
-    color: '#6B7280',
+  logoutText: {
+    marginLeft: 8,
+    fontSize: 14,
+    color: '#2e7d32',
   },
 });

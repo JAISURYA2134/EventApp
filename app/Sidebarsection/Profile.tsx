@@ -1,66 +1,103 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, TouchableOpacity, ScrollView, StyleSheet } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import {
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  ScrollView,
+  StyleSheet,
+} from 'react-native';
 import { useForm, Controller } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { MaterialIcons, FontAwesome, Feather } from '@expo/vector-icons';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { MaterialIcons, Feather } from '@expo/vector-icons';
+import { doc, updateDoc } from 'firebase/firestore';
+import { db } from '@/lib/firebase';
+import { useAppStore } from '@/lib/store';
 
-// Define the profile schema
 const profileSchema = z.object({
   name: z.string().min(1, 'Name is required'),
   email: z.string().email('Invalid email'),
-  phoneNumber: z.string().min(10, 'Phone number is required'),
 });
 
 type ProfileFormData = z.infer<typeof profileSchema>;
 
 export default function Profile() {
+  const { user, setUser } = useAppStore();
   const [isEditing, setIsEditing] = useState(false);
 
-  const [user, setUser] = useState({
-    name: 'Jaisurya',
-    email: 'jai@email.com',
-    phoneNumber: '1234567890',
-    isVerified: true,
-    createdAt: new Date(),
-  });
-
-  const { control, handleSubmit, formState: { errors }, setValue } = useForm<ProfileFormData>({
+  const {
+    control,
+    handleSubmit,
+    formState: { errors },
+    setValue,
+  } = useForm<ProfileFormData>({
     resolver: zodResolver(profileSchema),
     defaultValues: {
-      name: user.name,
-      email: user.email,
-      phoneNumber: user.phoneNumber,
+      name: user?.name || '',
+      email: user?.email || '',
     },
   });
 
   useEffect(() => {
-    setValue('name', user.name);
-    setValue('email', user.email);
-    setValue('phoneNumber', user.phoneNumber);
+    if (user) {
+      setValue('name', user.name);
+      setValue('email', user.email);
+    }
   }, [user, setValue]);
 
-  const onSubmit = (data: ProfileFormData) => {
-    setUser({ ...user, ...data });
-    setIsEditing(false);
+  const onSubmit = async (data: ProfileFormData) => {
+    if (!user) return;
+    try {
+      const userRef = doc(db, 'users', user.id); // assumes email is doc ID
+      await updateDoc(userRef, {
+        name: data.name,
+        email: data.email,
+      });
+
+      setUser({
+        ...user,
+        ...data,
+        isVerified: user.isVerified ?? false,
+      });
+
+      setIsEditing(false);
+    } catch (error) {
+      console.error('Error updating profile:', error);
+    }
   };
+
+  if (!user) {
+    return (
+      <View style={styles.container}>
+        <Text>Loading profile...</Text>
+      </View>
+    );
+  }
 
   return (
     <ScrollView style={styles.container}>
       {/* Profile Header */}
       <View style={[styles.card, { position: 'relative' }]}>
         <View style={styles.badgeTopLeft}>
-          <Text style={[styles.badge, user.isVerified ? styles.verified : styles.notVerified]}>
+          <Text
+            style={[
+              styles.badge,
+              user.isVerified ? styles.verified : styles.notVerified,
+            ]}
+          >
             {user.isVerified ? 'Verified' : 'Not Verified'}
           </Text>
         </View>
         <View style={styles.avatarContainer}>
-          <Text style={styles.avatarText}>{user.name.charAt(0).toUpperCase()}</Text>
+          <Text style={styles.avatarText}>
+            {user.name?.charAt(0).toUpperCase()}
+          </Text>
         </View>
         <Text style={styles.profileName}>{user.name}</Text>
       </View>
 
-      {/* Profile Info Card */}
+      {/* Profile Info */}
       <View style={styles.card}>
         <View style={styles.cardHeader}>
           <Text style={styles.cardTitle}>Profile Information</Text>
@@ -70,7 +107,7 @@ export default function Profile() {
         </View>
 
         {isEditing ? (
-          <View>
+          <>
             <Controller
               control={control}
               name="name"
@@ -83,7 +120,9 @@ export default function Profile() {
                 />
               )}
             />
-            {errors.name && <Text style={styles.error}>{errors.name.message}</Text>}
+            {errors.name && (
+              <Text style={styles.error}>{errors.name.message}</Text>
+            )}
 
             <Controller
               control={control}
@@ -98,32 +137,25 @@ export default function Profile() {
                 />
               )}
             />
-            {errors.email && <Text style={styles.error}>{errors.email.message}</Text>}
-
-            <Controller
-              control={control}
-              name="phoneNumber"
-              render={({ field }) => (
-                <TextInput
-                  style={styles.input}
-                  placeholder="Phone Number"
-                  keyboardType="phone-pad"
-                  value={field.value}
-                  onChangeText={field.onChange}
-                />
-              )}
-            />
-            {errors.phoneNumber && <Text style={styles.error}>{errors.phoneNumber.message}</Text>}
+            {errors.email && (
+              <Text style={styles.error}>{errors.email.message}</Text>
+            )}
 
             <View style={styles.row}>
-              <TouchableOpacity style={styles.saveButton} onPress={handleSubmit(onSubmit)}>
+              <TouchableOpacity
+                style={styles.saveButton}
+                onPress={handleSubmit(onSubmit)}
+              >
                 <Text style={styles.saveButtonText}>Save</Text>
               </TouchableOpacity>
-              <TouchableOpacity style={styles.cancelButton} onPress={() => setIsEditing(false)}>
+              <TouchableOpacity
+                style={styles.cancelButton}
+                onPress={() => setIsEditing(false)}
+              >
                 <Text style={styles.cancelButtonText}>Cancel</Text>
               </TouchableOpacity>
             </View>
-          </View>
+          </>
         ) : (
           <View style={styles.infoBlock}>
             <View style={styles.infoRow}>
@@ -131,20 +163,6 @@ export default function Profile() {
               <View style={styles.infoTextGroup}>
                 <Text style={styles.label}>Email</Text>
                 <Text style={styles.value}>{user.email}</Text>
-              </View>
-            </View>
-            <View style={styles.infoRow}>
-              <FontAwesome name="phone" size={20} color="#6b7280" />
-              <View style={styles.infoTextGroup}>
-                <Text style={styles.label}>Phone</Text>
-                <Text style={styles.value}>{user.phoneNumber}</Text>
-              </View>
-            </View>
-            <View style={styles.infoRow}>
-              <FontAwesome name="calendar" size={20} color="#6b7280" />
-              <View style={styles.infoTextGroup}>
-                <Text style={styles.label}>Member Since</Text>
-                <Text style={styles.value}>{user.createdAt.toLocaleDateString()}</Text>
               </View>
             </View>
           </View>
@@ -158,6 +176,7 @@ const styles = StyleSheet.create({
   container: {
     padding: 16,
     backgroundColor: '#f9fafb',
+    paddingTop: 70,
   },
   card: {
     backgroundColor: 'white',

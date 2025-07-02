@@ -2,9 +2,11 @@ import { create } from 'zustand';
 import { Section } from './types';
 
 type User = {
+  id:string;
   name: string;
   email: string;
   isVerified: boolean;
+  isAdmin?:boolean;
 };
 
 type AppState = {

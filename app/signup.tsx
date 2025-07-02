@@ -205,8 +205,8 @@ const styles = StyleSheet.create({
   
   },
     logo: {
-    width: 100,
-    height: 100,
+    width: 200,
+    height: 140,
     marginBottom: 16,
 
   },
@@ -228,7 +228,7 @@ const styles = StyleSheet.create({
   subtitle: {
     fontSize: 14,
     textAlign: 'center',
-    color: '#6b7280',
+    color: '#2e7d32',
     marginBottom: 20,
   },
   inputWrapper: {
@@ -242,7 +242,7 @@ const styles = StyleSheet.create({
   },
   icon: {
     marginRight: 8,
-    color: '#9ca3af',
+    color: '#2e7d32',
   },
   input: {
     flex: 1,
@@ -250,7 +250,7 @@ const styles = StyleSheet.create({
     color: '#000'
   },
   button: {
-    backgroundColor: '#119822',
+    backgroundColor: '#2e7d32',
     paddingVertical: 12,
     borderRadius: 10,
     marginTop: 12,
@@ -280,7 +280,7 @@ footerText: {
   marginTop: 16,
 },
 loginLink: {
-  color: '#119822',
+  color: '#2e7d32',
   fontWeight: 'bold',
 },
 phonePrefix: {
@@ -299,6 +299,4 @@ phoneInput: {
   paddingLeft: 10,
   color: '#000',
 },
-
-
 });

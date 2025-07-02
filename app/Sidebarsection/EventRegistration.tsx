@@ -10,6 +10,10 @@ import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view
 import { Picker } from '@react-native-picker/picker';
 import { locationMasterData } from '@/lib/locationMasterData';
 import { collection, addDoc, Timestamp } from 'firebase/firestore';
+import { Alert } from 'react-native';
+import { Dimensions } from 'react-native';
+
+const screenWidth = Dimensions.get('window').width;
 
 const schema = z
   .object({
@@ -164,16 +168,31 @@ export default function EventRegistration() {
 
   // Calculate age from birthday
   useEffect(() => {
-    if (birthday) {
-      const birthDate = new Date(birthday);
-      if (!isNaN(birthDate.getTime())) {
-        const ageDifMs = Date.now() - birthDate.getTime();
-        const ageDate = new Date(ageDifMs);
-        const age = Math.abs(ageDate.getUTCFullYear() - 1970);
-        setValue('age', age);
-      }
+  if (birthday) {
+    // Normalize: allow both "13-03-2004" and "13/03/2004"
+    const normalized = birthday.replace(/\//g, '-');
+
+    const [day, month, year] = normalized.split('-').map(Number); // Split and convert to numbers
+    const birthDate = new Date(year, month - 1, day); // month is 0-based
+
+    if (!isNaN(birthDate.getTime())) {
+      const ageDifMs = Date.now() - birthDate.getTime();
+      const ageDate = new Date(ageDifMs);
+      const age = Math.abs(ageDate.getUTCFullYear() - 1970);
+      setValue('age', age);
     }
-  }, [birthday, setValue]);
+  }
+}, [birthday, setValue]);
+
+
+//PLACEHODER BDAY
+const getTodayDate = () => {
+  const today = new Date();
+  const dd = String(today.getDate()).padStart(2, '0');
+  const mm = String(today.getMonth() + 1).padStart(2, '0'); // Months are 0-based
+  const yyyy = today.getFullYear();
+  return `${dd}-${mm}-${yyyy}`;
+};
 
   const onSubmit = async (data: FormData) => {
     try {
@@ -191,7 +210,7 @@ export default function EventRegistration() {
       setAcceptedTerms(false);
     } catch (e) {
       console.error('Error adding document: ', e);
-      alert('பதிவு செய்ய முடியவில்லை / Submission failed');
+      Alert.alert('பதிவு செய்ய முடியவில்லை / Submission failed');
     }
   };
 
@@ -222,7 +241,7 @@ export default function EventRegistration() {
       <View style={styles.eventContainer}>
         <View style={styles.animationPlaceholder}>
           <RNText style={{ color: 'white', fontSize: 16, fontWeight: 'bold' }}>
-            🎉 விழா அறிவிப்பு - ஒருங்கிணைந்த வேளாளர்/வெள்ளாளர் சங்க கூட்டமைப்பு மாநாடு 🎉
+            🎉ஒருங்கிணைந்த வேளாளர்/வெள்ளாளர் சங்க கூட்டமைப்பு மாநாடு 🎉
           </RNText>
         </View>
 
@@ -231,19 +250,15 @@ export default function EventRegistration() {
           <RNText style={styles.eventInfo}>நேரம்: மாலை 4.00 மணி</RNText>
           <RNText style={styles.eventInfo}>இடம்: ஜி கார்னர், திருச்சிராப்பள்ளி</RNText>
         </View>
-
-        <Button
-          mode="contained"
-          onPress={() => setStep('form')}
-          style={styles.button}
-          contentStyle={styles.buttonContent}
-        >
-          பதிவு செய்ய
-        </Button>
+        <TouchableOpacity
+  style={styles.cardButton}
+  onPress={() => setStep('form')}
+>
+  <Text style={styles.cardButtonText}>பதிவு செய்ய/ Register</Text>
+</TouchableOpacity>
       </View>
     );
   }
-
   // Custom Dropdown Component
   const Dropdown = ({ label, value, onChange, items, error }: any) => (
     <View style={styles.dropdownContainer}>
@@ -297,15 +312,16 @@ export default function EventRegistration() {
       <Controller
         control={control}
         name="birthday"
-        render={({ field }) => (
+        render={({ field: { onChange, value } }) => (
           <>
             <TextInput
-              label="பிறந்த தேதி(ஆண்டு-மாதம்-தேதி) / Birthday"
-              value={field.value}
-              onChangeText={field.onChange}
+              label="பிறந்த தேதி(ஆண்டு-மாதம்-தேதி)/ Birthday"
+              value={value}
+              
+              onChangeText={onChange}
               mode="outlined"
               style={styles.input}
-              placeholder="2025-07-13"
+              placeholder={getTodayDate()}
               activeOutlineColor="#047857"
             />
             {errors.birthday && <HelperText type="error">{errors.birthday.message}</HelperText>}
@@ -497,7 +513,7 @@ export default function EventRegistration() {
         render={({ field }) => (
           <>
             <TextInput
-              label="பட்டம் / Degree"
+              label=" படிப்பு/ Degree"
               value={field.value}
               onChangeText={field.onChange}
               mode="outlined"
@@ -585,6 +601,7 @@ export default function EventRegistration() {
       )}
 
       {/* Mode of Transport (always visible) */}
+      
       <Controller
         control={control}
         name="modeOfTransport"
@@ -654,26 +671,31 @@ export default function EventRegistration() {
           "வேளாளர் சமூக மாநாடு மற்றும் மாநாட்டுப் பொறுப்பாளர்களின் சட்ட திட்டங்களுக்கு உட்பட்டு வேளாளர் மாநாட்டில் கலந்து கொண்டு சிறப்பிக்க உறுதிமொழி அளிக்கின்றேன்."
         </RNText>
       </View>
-
       <Button
-        mode="contained"
-        onPress={() => {
-          if (!acceptedTerms) {
-            alert("தயவுசெய்து நிபந்தனைகளை ஏற்கவும் / Please accept the terms and conditions.");
-            return;
-          }
-          handleSubmit(onSubmit)();
-        }}
-        style={styles.submitButton}
-        contentStyle={styles.FbuttonContent}
-      >
-        சமர்ப்பிக்க / Submit
-      </Button>
+  mode="outlined"
+  onPress={() => {
+    if (!acceptedTerms) {
+      Alert.alert("தயவுசெய்து நிபந்தனைகளை ஏற்கவும் / accept the conditions.");
+      return;
+    }
+    handleSubmit(onSubmit)();
+  }}
+  style={styles.cardButton1}            // ✅ Green border, rounded
+  contentStyle={{ backgroundColor: '#ffffff', paddingHorizontal: 73, paddingVertical: 0 }} // ✅ White background
+  labelStyle={styles.cardButtonText1}   // ✅ Green bold text
+>
+  சமர்ப்பிக்க / Submit
+</Button>
+
     </KeyboardAwareScrollView>
   );
 }
 
 const styles = StyleSheet.create({
+  fullScreen: {
+    flex: 1,
+    backgroundColor: '#ffffff', 
+  },
   container: {
     padding: 16,
     backgroundColor: '#ffffff',
@@ -685,6 +707,7 @@ const styles = StyleSheet.create({
     shadowRadius: 8,
     marginBottom: 20,
     flexGrow: 1,
+    paddingTop: 70
   },
   title: {
     fontSize: 24,
@@ -742,6 +765,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#1f2937',
   },
+  
   button: {
     width: '100%',
     paddingVertical: 6,
@@ -757,26 +781,66 @@ const styles = StyleSheet.create({
   },
   FbuttonContent: {
     paddingHorizontal: 24,
-    paddingVertical: 6
+    paddingVertical: 6,
+    color: '#1b5e20',
   },
+cardButton: {
+    borderWidth: 1,
+    
+    borderColor: '#2e7d32',
+    paddingVertical: 10,
+    borderRadius: 24,
+    alignItems: 'center',
+    
+  },
+  cardButtonText: {
+    color: '#1b5e20',
+    fontWeight: 'bold',
+    fontSize: 16,
+  },
+  cardButton1: {
+    borderWidth: 1,
+    borderColor: '#2e7d32',
+    marginBottom:10,
+    paddingVertical: 3,
+    borderRadius: 24,
+    alignItems: 'center',
+    
+  },
+  cardButtonText1: {
+    color: '#1b5e20',
+    fontWeight: 'bold',
+    fontSize: 16,
+  },
+
+
+
   eventContainer: {
-    backgroundColor: '#ffff',
-    padding: 16,
-    borderRadius: 12,
-    marginBottom: 20,
-    shadowColor: '#000',
-    shadowOpacity: 0.1,
-    shadowOffset: { width: 0, height: 2 },
-    shadowRadius: 4,
-    elevation: 3,
-  },
+  width: screenWidth * 0.9, // 90% width looks elegant
+  alignSelf: 'center',    // aligns to the right
+  backgroundColor: '#ffffff',
+  paddingVertical: 20,
+  paddingHorizontal: 16,
+  borderRadius: 16,
+  marginTop: 75,
+  marginBottom: 20,
+  shadowColor: '#000',
+  shadowOpacity: 0.1,
+  shadowOffset: { width: 0, height: 3 },
+  shadowRadius: 6,
+  elevation: 5,
+},
+
+
+
   eventInfo: {
     fontSize: 16,
-    color: '#047857',
-    textAlign: 'center',
+    color: '#1b5e20',
+    textAlign: 'left',
   },
   dropdownContainer: {
     marginBottom: 15,
+    
   },
   pickerContainer: {
     borderWidth: 1,
@@ -799,7 +863,7 @@ const styles = StyleSheet.create({
   },
   animationPlaceholder: {
     height: 150,
-    backgroundColor: 'rgba(17, 123, 68, 0.79)',
+    backgroundColor: 'rgba(12, 87, 48, 0.86)',
     borderRadius: 11,
     marginBottom: 20,
     alignItems: 'center',
