@@ -41,6 +41,7 @@ useAppStore.getState().setUser({
   name: userData.name,
   email: userData.email,
   isVerified: userData.isVerified ?? false,
+  avatarUrl: userData.avatarUrl || '',
   isAdmin: userData.email === 'admin@gmail.com' && password === 'admin1', // ✅ Admin check
 });
 
@@ -62,7 +63,7 @@ useAppStore.getState().setUser({
           style={styles.logo}
           resizeMode="contain"
         />
-        <Text style={styles.title}>Welcome Back</Text>
+        <Text style={styles.title}>Welcome</Text>
         <Text style={styles.subtitle}>Login to continue</Text>
 
         {/* Email or Phone Number Field */}

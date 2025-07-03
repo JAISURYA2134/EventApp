@@ -20,6 +20,7 @@ const screenWidth = Dimensions.get('window').width;
 const cardWidth = screenWidth * 0.85;
 const cardSpacing = 16;
 
+
 const cards: Card[] = [
   {
     title: 'About Us',
@@ -56,7 +57,9 @@ const cards: Card[] = [
 ];
 
 export default function Home() {
-  const { setCurrentSection } = useAppStore();
+  const user = useAppStore(state => state.user);
+const setCurrentSection = useAppStore(state => state.setCurrentSection);
+
   const scrollRef = useRef<ScrollView>(null);
   const [activeIndex, setActiveIndex] = useState(0);
 
@@ -81,13 +84,22 @@ export default function Home() {
       <View style={styles.navbar}>
         <View style={styles.greetingContainer} />
         <View style={styles.rightSection}>
-          <TouchableOpacity onPress={() => setCurrentSection('profile')}>
-            <Image
-              source={require('@/assets/images/bg.png')}
-              style={styles.profileImage}
-            />
-          </TouchableOpacity>
-        </View>
+<TouchableOpacity onPress={() => setCurrentSection('profile')}>
+  <View style={styles.avatarContainer}key={user?.avatarUrl || 'default-avatar'}>
+    {user?.avatarUrl && user.avatarUrl.length > 0 ? (
+      <Image
+        source={{ uri: user.avatarUrl }}
+        style={styles.avatarImage}
+      />
+    ) : (
+      <Text style={styles.avatarText}>
+        {user?.name?.charAt(0).toUpperCase() || 'U'}
+      </Text>
+    )}
+  </View>
+</TouchableOpacity>
+
+</View>
       </View>
 
       <ScrollView showsVerticalScrollIndicator={false}>
@@ -282,4 +294,25 @@ const styles = StyleSheet.create({
     padding: 6,
     zIndex: 10,
   },
+  avatarContainer: {
+  width: 36,
+  height: 36,
+  borderRadius: 18,
+  backgroundColor: '#a5d6a7',
+  justifyContent: 'center',
+  alignItems: 'center',
+},
+avatarText: {
+  color: 'white',
+  fontWeight: 'bold',
+  fontSize: 18,
+},
+avatarImage: {
+  width: '100%',
+  height: '100%',
+  borderRadius: 18,
+  resizeMode: 'cover',
+},
+
 });
+

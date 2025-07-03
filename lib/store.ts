@@ -7,6 +7,7 @@ type User = {
   email: string;
   isVerified: boolean;
   isAdmin?:boolean;
+  avatarUrl?: string;
 };
 
 type AppState = {

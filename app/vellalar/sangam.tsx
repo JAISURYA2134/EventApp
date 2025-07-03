@@ -1,9 +1,10 @@
 // app/vellalar/sangam.tsx
 import { ScrollView, Text, View, Image, StyleSheet } from 'react-native';
-
+import BackButton from '@/components/BackButton';
 export default function SangamScreen() {
   return (
 <ScrollView style={styles.container} contentContainerStyle={{ paddingBottom: 40 }}>
+      <BackButton/>
       <Image
         source={require('@/assets/images/lit.jpeg')}
         style={styles.image}

@@ -21,6 +21,12 @@ const vellalarCards = [
     summary: 'மரபாளன், கங்கை மகன் என வேளாளர் புராணக் கூறுகள்.',
   },
   {
+    id: 'gangai-maindhan',
+    title: 'கங்கை மைந்தன் மரபாளன் காஞ்சியில் குடியேறல்',
+    image: require('@/assets/images/purana.png'),
+    summary: 'கங்கை மைந்தர்கள் என அழைக்கப்படும் வேளாளர்களின் முன்னோர் மரபாளன் என வழங்கப்படுகின்றார்',
+  },
+  {
     id: 'gangai-amman',
     title: 'கங்கை அம்மன் வழிபாடு',
     image: require('@/assets/images/ganga.jpg'),
@@ -28,33 +34,50 @@ const vellalarCards = [
   },
   {
     id: 'migration',
-    title: 'குடிபெயர்தல் மற்றும் பரவல்',
+    title: 'வேளாளர் பரவல் -விரிவாக்கம் புலம் பெயர்தல்',
     image: require('@/assets/images/farm2.jpg'),
-    summary: 'வேளாளர் சமுதாயத்தின் விரிவாக்க வரலாறு.',
-  },
-  {
-    id: 'warriors',
-    title: 'போர்வீரர் மற்றும் நில உரிமையாளர்கள்',
-    image: require('@/assets/images/cow.jpg'),
-    summary: 'சிற்றரசர்கள், வேளாளர் தலைவர்கள் மற்றும் வீரம்.',
-  },
-  {
-    id: 'sangam',
-    title: 'சங்க இலக்கியங்களில் வேளாளர்',
-    image: require('@/assets/images/lit.jpeg'),
-    summary: 'அகம், புறம் இலக்கியங்களில் வேளாளர் பங்கு.',
+    summary: 'தொண்டை மண்டல சதகமும் சோழ மண்டல சதகமும்.',
   },
   {
     id: 'religion',
-    title: 'மதம் மற்றும் தெய்வ வழிபாடு',
+    title: 'வேளாளர் பெயர்க்காரணம்',
     image: require('@/assets/images/religion.jpg'),
-    summary: 'சைவ, சமண, துளுவ வேளாளர் வழிபாடுகள்.',
+  },
+  {
+    id: 'sangam',
+    title: 'சதுர்வர்ணம்',
+    image: require('@/assets/images/lit.jpeg'),
+    summary: 'வட இந்தியா போன்று தமிழகத்தில் ஆரியர்களின் சதுர்வர்ண...',
   },
   {
     id: 'social',
-    title: 'சமூக அமைப்பும் பெருமையும்',
+    title: 'வேளீர்-வேளாளர்',
     image: require('@/assets/images/samooga.jpg'),
-    summary: 'சமூக இடம், பண்பாடு, கிழார், உழவர் மரபுகள்.',
+    summary: 'பொதுவாக வரலாற்று ஆசிரியர்கள் மேற்சொன்னபடி சங்க...',
+  },
+  {
+    id: 'warriors',
+    title: 'கொடும்பாளூர் வேளீர்',
+    image: require('@/assets/images/cow.jpg'),
+    summary: 'வேளீர்கள் வேளாளர்களே என்பதற்கு மிகச் சிறந்த சான்று...',
+  },
+  {
+    id: 'vendhar',
+    title: 'வேளாளர்கள்- வேந்தர்கள்',
+    image: require('@/assets/images/cow.jpg'),
+    summary: 'வேளாளர்கள் சங்க காலத்தில் வேளிர்களாக அரசாட்சி...',
+  },
+  {
+    id: 'vaanaa',
+    title: 'வாணாதிராயர்கள்',
+    image: require('@/assets/images/cow.jpg'),
+    summary: 'மேற்குறித்தபடி பழைய வடஆற்காடு மாவட்டம், சித்தூர்.',
+  },
+  {
+    id: 'magabali',
+    title: 'மகாபலி இந்திரனை வெல்லுதல்',
+    image: require('@/assets/images/cow.jpg'),
+    summary: 'புராணங்களில் ஹிரண்யகசிபுவின் மகனான பிரகலாதனின் பேரனாகச் சித்தரிக்கப்படுபவர் மகாபலி.',
   },
 ];
 
@@ -82,14 +105,17 @@ export default function AboutUs() {
         </TouchableOpacity>
       ))}
     </ScrollView>
-  ); 
+  );
 }
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: '#f0fdf4',
+   // backgroundColor: '#f0fdf4',
+    backgroundColor: '#ffffff',
+    paddingTop:30,
     padding: 16,
-    paddingTop:20
+    paddingBottom:0,
+    
   },
   header: {
     fontSize: 22,

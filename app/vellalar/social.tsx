@@ -1,9 +1,10 @@
 // app/vellalar/social.tsx
 import { ScrollView, Text, View, Image, StyleSheet } from 'react-native';
-
+import BackButton from '@/components/BackButton';
 export default function SocialScreen() {
   return (
 <ScrollView style={styles.container} contentContainerStyle={{ paddingBottom: 40 }}>
+      <BackButton/>
       <Image
         source={require('@/assets/images/samooga.jpg')}
         style={styles.image}

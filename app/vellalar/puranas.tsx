@@ -1,9 +1,10 @@
 // app/vellalar/puranas.tsx
 import { ScrollView, Text, View, Image, StyleSheet } from 'react-native';
-
+import BackButton from '@/components/BackButton';
 export default function PuranasScreen() {
   return (
 <ScrollView style={styles.container} contentContainerStyle={{ paddingBottom: 40 }}>
+      <BackButton/>
       <Image
         source={require('@/assets/images/purana.png')}
         style={styles.image}

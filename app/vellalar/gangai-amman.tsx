@@ -1,14 +1,16 @@
 // app/vellalar/gangai-amman.tsx
 import { ScrollView, Text, View, Image, StyleSheet } from 'react-native';
-
+import BackButton from '@/components/BackButton';
 export default function GangaiAmmanScreen() {
   return (
 <ScrollView style={styles.container} contentContainerStyle={{ paddingBottom: 40 }}>
+  <BackButton/>
       <Image
         source={require('@/assets/images/ganga.jpg')}
         style={styles.image}
         resizeMode="cover"
       />
+
 
       <Text style={styles.title}>கங்கை அம்மன் வழிபாடு</Text>
 

@@ -1,9 +1,10 @@
 // app/vellalar/warriors.tsx
 import { ScrollView, Text, View, Image, StyleSheet } from 'react-native';
-
+import BackButton from '@/components/BackButton';
 export default function WarriorsScreen() {
   return (
 <ScrollView style={styles.container} contentContainerStyle={{ paddingBottom: 40 }}>
+      <BackButton/>
       <Image
         source={require('@/assets/images/cow.jpg')}
         style={styles.image}

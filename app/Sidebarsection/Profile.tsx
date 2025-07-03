@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   ScrollView,
   StyleSheet,
+  Image,
 } from 'react-native';
 import { useForm, Controller } from 'react-hook-form';
 import { z } from 'zod';
@@ -14,6 +15,8 @@ import { MaterialIcons, Feather } from '@expo/vector-icons';
 import { doc, updateDoc } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { useAppStore } from '@/lib/store';
+import * as ImagePicker from 'expo-image-picker';
+import * as FileSystem from 'expo-file-system';
 
 const profileSchema = z.object({
   name: z.string().min(1, 'Name is required'),
@@ -49,7 +52,7 @@ export default function Profile() {
   const onSubmit = async (data: ProfileFormData) => {
     if (!user) return;
     try {
-      const userRef = doc(db, 'users', user.id); // assumes email is doc ID
+      const userRef = doc(db, 'users', user.id);
       await updateDoc(userRef, {
         name: data.name,
         email: data.email,
@@ -66,6 +69,32 @@ export default function Profile() {
       console.error('Error updating profile:', error);
     }
   };
+
+  const handleImagePick = async () => {
+    const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (!permissionResult.granted) {
+      alert('Permission to access camera roll is required!');
+      return;
+    }
+
+    const pickerResult = await ImagePicker.launchImageLibraryAsync({
+       base64: true,
+      allowsEditing: true,
+      aspect: [1, 1],
+      quality: 0.7,
+    });
+
+    if (!pickerResult.canceled) {
+    const base64Image = `data:image/jpeg;base64,${pickerResult.assets[0].base64}`;
+
+    if (user) {
+      const userRef = doc(db, 'users', user.id);
+      await updateDoc(userRef, { avatarUrl: base64Image });
+
+      setUser({ ...user, avatarUrl: base64Image });
+    }
+  }
+};
 
   if (!user) {
     return (
@@ -89,11 +118,27 @@ export default function Profile() {
             {user.isVerified ? 'Verified' : 'Not Verified'}
           </Text>
         </View>
-        <View style={styles.avatarContainer}>
-          <Text style={styles.avatarText}>
-            {user.name?.charAt(0).toUpperCase()}
-          </Text>
-        </View>
+
+        {/* Choose Image */}
+        <TouchableOpacity
+          style={styles.chooseImageButton}
+          onPress={handleImagePick}
+        >
+          <Text style={styles.chooseImageText}>Choose Image</Text>
+        </TouchableOpacity>
+
+        {/* Avatar */}
+ <View style={styles.avatarContainer} key={user.avatarUrl || 'initial'}>
+  {user.avatarUrl ? (
+    <Image source={{ uri: user.avatarUrl }} style={styles.avatarImage} />
+  ) : (
+    <Text style={styles.avatarText}>
+      {user.name?.charAt(0).toUpperCase()}
+    </Text>
+  )}
+</View>
+
+
         <Text style={styles.profileName}>{user.name}</Text>
       </View>
 
@@ -202,16 +247,22 @@ const styles = StyleSheet.create({
     width: 80,
     height: 80,
     borderRadius: 40,
-    backgroundColor: '#047857',
+    backgroundColor: '#a5d6a7', // Light green
     justifyContent: 'center',
     alignItems: 'center',
     alignSelf: 'center',
     marginBottom: 8,
+    overflow: 'hidden',
   },
   avatarText: {
     color: 'white',
     fontSize: 32,
     fontWeight: 'bold',
+  },
+  avatarImage: {
+    width: '100%',
+    height: '100%',
+    resizeMode: 'cover',
   },
   badgeTopLeft: {
     position: 'absolute',
@@ -238,6 +289,18 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     alignSelf: 'center',
     marginTop: 4,
+  },
+  chooseImageButton: {
+    alignSelf: 'center',
+    marginBottom: 8,
+    backgroundColor: '#d0f0c0',
+    paddingVertical: 6,
+    paddingHorizontal: 12,
+    borderRadius: 20,
+  },
+  chooseImageText: {
+    color: '#065f46',
+    fontWeight: 'bold',
   },
   input: {
     borderWidth: 1,
