@@ -23,9 +23,9 @@ interface Registration {
   name: string;
   phoneNumber: string;
   district: string;
-  village: string;
+  taluk: string;
   scanned?: boolean;
-  personStatus?: string;
+  // personStatus?: string;
 }
 
 const PAGE_SIZE = 10;
@@ -111,23 +111,18 @@ const renderCell = (content: React.ReactNode) => (
 
 const renderItem = ({ item, index }: { item: Registration; index: number }) => {
   const statusText = item.scanned ? 'scanned' : 'registered';
-  const personStatus = item.personStatus || 'N/A';
+  // const personStatus = item.personStatus || 'N/A';
 
   const getTag = (status: string) => {
     const lower = status.toLowerCase();
-    if (lower === 'arrived') {
+    if (lower === 'registered') {
       return (
         <View style={[styles.tag, styles.arrivedTag]}>
           <Text style={styles.tagText}>Arrived</Text>
         </View>
       );
-    } else if (lower === 'not arrived') {
-      return (
-        <View style={[styles.tag, styles.notArrivedTag]}>
-          <Text style={styles.tagText}>Not Arrived</Text>
-        </View>
-      );
-    } else {
+    } 
+    else {
       return <Text style={styles.cellText}>{status}</Text>;
     }
   };
@@ -138,9 +133,10 @@ const renderItem = ({ item, index }: { item: Registration; index: number }) => {
       {renderCell(item.name)}
       {renderCell(item.phoneNumber)}
       {renderCell(item.district)}
-      {renderCell(item.village)}
-      {renderCell(statusText)}
-      {renderCell(getTag(personStatus))}
+      {renderCell(item.taluk)}
+      {renderCell(getTag(statusText))}
+
+      
     </View>
   );
 };
@@ -159,9 +155,9 @@ const renderItem = ({ item, index }: { item: Registration; index: number }) => {
             {renderCell('Name')}
             {renderCell('Contact')}
             {renderCell('District')}
-            {renderCell('Village')}
+            {renderCell('Taluk')}
             {renderCell('Status')}
-            {renderCell('Person Status')}
+            {/* {renderCell('Person Status')} */}
           </View>
 
           <FlatList

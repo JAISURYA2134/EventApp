@@ -15,6 +15,7 @@ import { useAppStore } from '@/lib/store';
 import { Card } from '@/lib/types';
 import { leaders } from '@/lib/leaderData';
 import { MaterialIcons } from '@expo/vector-icons';
+import EventCard from '@/components/EventCard';
 
 const screenWidth = Dimensions.get('window').width;
 const cardWidth = screenWidth * 0.85;
@@ -27,33 +28,25 @@ const cards: Card[] = [
     description: 'Learn more about our society, values, and vision.',
     route: '/Sidebarsection/AboutUs',
     sectionKey: 'about-us',
-    image: require('@/assets/images/aboutus.jpeg'),
-    buttonLabel: 'Know More',
+    image: require('@/assets/images/aboutus2.jpg'),
+    buttonLabel: 'Read',
   },
   {
     title: 'Vision',
-    description: 'Understand our long-term goals and direction.',
+    description: 'Understand our long-term goals and directions.',
     route: '/Sidebarsection/Vision',
     sectionKey: 'vision',
-    image: require('@/assets/images/farm.webp'),
-    buttonLabel: 'View Vision',
+    image: require('@/assets/images/vision2.jpg'),
+    buttonLabel: 'Vision',
   },
-  {
-    title: 'Event Registration',
-    description: 'Register for upcoming community events.',
-    route: '/Sidebarsection/EventRegistration',
-    sectionKey: 'event-registration',
-    image: require('@/assets/images/register.jpg'),
-    buttonLabel: 'Register Now',
-  },
-  {
-    title: 'Event Pass',
-    description: 'You can view your pass here.',
-    route: '/Sidebarsection/EventPass',
-    sectionKey: 'eventpass',
-    image: require('@/assets/images/pass.png'),
-    buttonLabel: 'View Pass',
-  },
+  // {
+  //   title: 'Event Pass',
+  //   description: 'You can view your pass here.',
+  //   route: '/Sidebarsection/EventPass',
+  //   sectionKey: 'eventpass',
+  //   image: require('@/assets/images/pass.png'),
+  //   buttonLabel: 'View Pass',
+  // },
 ];
 
 export default function Home() {
@@ -101,8 +94,9 @@ const setCurrentSection = useAppStore(state => state.setCurrentSection);
 
 </View>
       </View>
-
+      
       <ScrollView showsVerticalScrollIndicator={false}>
+        <EventCard/>
         {/* Static Info Cards */}
         {cards.map((card, index) => (
           <View key={index} style={styles.cardBox}>
@@ -113,7 +107,7 @@ const setCurrentSection = useAppStore(state => state.setCurrentSection);
               style={styles.cardButton}
               onPress={() => setCurrentSection(card.sectionKey)}
             >
-              <Text style={styles.cardButtonText}>▶ {card.buttonLabel}</Text>
+              <Text style={styles.cardButtonText}> {card.buttonLabel}</Text>
             </TouchableOpacity>
           </View>
         ))}
@@ -216,7 +210,7 @@ const styles = StyleSheet.create({
   },
   cardImage: {
     width: '100%',
-    height: 290,
+    height: 200,
     borderRadius: 12,
     marginBottom: 12,
   },

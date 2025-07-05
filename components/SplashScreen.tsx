@@ -58,7 +58,7 @@ const SplashScreen: React.FC<SplashScreenProps> = ({ onComplete }) => {
           style={styles.logo}
           resizeMode="contain"
         />
-        <Text style={styles.title}>Vellalar Welfare Society</Text>
+        <Text style={styles.title}>Integrated Velalar Vellalar Cultural Welfare Society</Text>
       </Animated.View>
     </View>
   );
@@ -82,7 +82,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 22,
     fontWeight: '700',
-    color: '#4a2e00',
+    color: '#000000',
     textAlign: 'center',
   },
 });

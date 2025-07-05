@@ -1,14 +1,25 @@
-
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image } from 'react-native';
+import {
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  StyleSheet,
+  Image,
+  KeyboardAvoidingView,
+  Platform,
+  ScrollView,
+  TouchableWithoutFeedback,
+  Keyboard
+} from 'react-native';
 import { useState } from 'react';
 import { useAppStore } from '@/lib/store';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
-import { db } from '@/lib/firebase'; // Your Firebase config path
+import { db } from '@/lib/firebase';
 import { collection, query, where, getDocs } from 'firebase/firestore';
 
 export default function LoginScreen() {
-  const [identifier, setIdentifier] = useState(''); // Email or Phone
+  const [identifier, setIdentifier] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const router = useRouter();
@@ -17,8 +28,6 @@ export default function LoginScreen() {
     setError('');
     try {
       const usersRef = collection(db, 'users');
-
-      // Detect whether the user entered email or phone
       const isEmail = identifier.includes('@');
 
       const q = query(
@@ -28,24 +37,22 @@ export default function LoginScreen() {
       );
 
       const querySnapshot = await getDocs(q);
-
       if (!querySnapshot.empty) {
         const docSnap = querySnapshot.docs[0];
-const userData = docSnap.data();
-const userId = docSnap.id;
+        const userData = docSnap.data();
+        const userId = docSnap.id;
 
-        // Set user globally
-// Set user globally
-useAppStore.getState().setUser({
-  id:userId,
-  name: userData.name,
-  email: userData.email,
-  isVerified: userData.isVerified ?? false,
-  avatarUrl: userData.avatarUrl || '',
-  isAdmin: userData.email === 'admin@gmail.com' && password === 'admin1', // ✅ Admin check
-});
+        useAppStore.getState().setUser({
+          id: userId,
+          name: userData.name,
+          email: userData.email,
+          phoneNumber:userData.phoneNumber,
+          isVerified: userData.isVerified ?? false,
+          avatarUrl: userData.avatarUrl || '',
+          isAdmin: userData.email === 'admin@gmail.com' && password === 'admin1',
+        });
 
-        router.replace('/sidebar'); // Navigate to home screen
+        router.replace('/sidebar');
       } else {
         setError('Invalid email/phone or password');
       }
@@ -56,57 +63,67 @@ useAppStore.getState().setUser({
   };
 
   return (
-    <View style={styles.container}>
-      <View style={styles.card}>
-        <Image
-          source={require('@/assets/images/logo.png')} // ✅ Update this path as needed
-          style={styles.logo}
-          resizeMode="contain"
-        />
-        <Text style={styles.title}>Welcome</Text>
-        <Text style={styles.subtitle}>Login to continue</Text>
+    <KeyboardAvoidingView
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      style={{ flex: 1 }}
+    >
+      <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+        <ScrollView contentContainerStyle={{ flexGrow: 1 }} keyboardShouldPersistTaps="handled">
+          <View style={styles.container}>
+            <View style={styles.card}>
+              <Image
+                source={require('@/assets/images/logo.png')}
+                style={styles.logo}
+                resizeMode="contain"
+              />
+              <Text style={styles.title}>Welcome</Text>
+              <Text style={styles.subtitle}>Sign in</Text>
 
-        {/* Email or Phone Number Field */}
-        <View style={styles.inputWrapper}>
-          <Ionicons name="person" size={18} style={styles.icon} />
-          <TextInput
-            style={styles.input}
-            placeholder="Email or Phone Number"
-            keyboardType="default"
-            value={identifier}
-            onChangeText={setIdentifier}
-            autoCapitalize="none"
-            placeholderTextColor="#9ca3af"
-          />
-        </View>
+              <View style={styles.inputWrapper}>
+                <Ionicons name="person" size={18} style={styles.icon} />
+                <TextInput
+                  style={styles.input}
+                  placeholder="Email or Phone Number"
+                  keyboardType="default"
+                  value={identifier}
+                  onChangeText={setIdentifier}
+                  autoCapitalize="none"
+                  placeholderTextColor="#9ca3af"
+                />
+              </View>
 
-        {/* Password Field */}
-        <View style={styles.inputWrapper}>
-          <Ionicons name="lock-closed" size={18} style={styles.icon} />
-          <TextInput
-            style={styles.input}
-            placeholder="Password"
-            secureTextEntry
-            value={password}
-            onChangeText={setPassword}
-            placeholderTextColor="#9ca3af"
-          />
-        </View>
+              <View style={styles.inputWrapper}>
+                <Ionicons name="lock-closed" size={18} style={styles.icon} />
+                <TextInput
+                  style={styles.input}
+                  placeholder="Password"
+                  secureTextEntry
+                  value={password}
+                  onChangeText={setPassword}
+                  placeholderTextColor="#9ca3af"
+                />
+              </View>
 
-        {error ? <Text style={styles.errorText}>{error}</Text> : null}
+              {error ? <Text style={styles.errorText}>{error}</Text> : null}
 
-        <TouchableOpacity style={styles.button} onPress={handleLogin}>
-          <Text style={styles.buttonText}>Login</Text>
-        </TouchableOpacity>
+              <TouchableOpacity style={styles.button} onPress={handleLogin}>
+                <Text style={styles.buttonText}>Sign in</Text>
+              </TouchableOpacity>
 
-        <Text style={styles.footerText}>
-          Are you new?{' '}
-          <Text style={styles.signupLink} onPress={() => router.replace('/signup')}>
-            Sign Up
-          </Text>
-        </Text>
-      </View>
-    </View>
+              <Text style={styles.footerText}>
+                     new?{' '}
+                <Text style={styles.signupLink} onPress={() => router.replace('/signup')}>
+                  Sign Up
+                </Text>
+              </Text>
+              <Text style={styles.footerText}>
+                Powered By - Yaanar Technologies
+              </Text>
+            </View>
+          </View>
+        </ScrollView>
+      </TouchableWithoutFeedback>
+    </KeyboardAvoidingView>
   );
 }
 

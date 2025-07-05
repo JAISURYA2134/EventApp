@@ -176,7 +176,7 @@ await addDoc(collection(db, 'users'), {
         <Text style={styles.footerText}>
           Already have an account?{' '}
           <Text style={styles.loginLink} onPress={() => router.replace('/Login')}>
-            Login
+            Sign in
           </Text>
         </Text>
 

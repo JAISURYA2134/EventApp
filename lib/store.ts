@@ -5,6 +5,7 @@ type User = {
   id:string;
   name: string;
   email: string;
+  phoneNumber : string;
   isVerified: boolean;
   isAdmin?:boolean;
   avatarUrl?: string;

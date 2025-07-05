@@ -32,15 +32,15 @@ type FeatherIconName =
 const baseNavItems: { icon: FeatherIconName; label: string; section: Section }[] = [
   { icon: 'home', label: 'Home', section: 'home' },
   { icon: 'calendar', label: 'Event Registration', section: 'event-registration' },
-  { icon: 'clipboard', label: 'Event Pass', section: 'eventpass' },
-  { icon: 'eye', label: 'Vision', section: 'vision' },
+  // { icon: 'clipboard', label: 'Event Pass', section: 'eventpass' },
   { icon: 'info', label: 'About Us', section: 'about-us' },
+  { icon: 'eye', label: 'Vision', section: 'vision' },
   { icon: 'user', label: 'My Profile', section: 'profile' },
 ];
 
 const adminOnlyNavItems: { icon: FeatherIconName; label: string; section: Section }[] = [
   { icon: 'bar-chart-2', label: 'Attendance List', section: 'attendance' },
-  { icon: 'calendar', label: 'QR Scanner', section: 'qrscanner' },
+  // { icon: 'calendar', label: 'QR Scanner', section: 'qrscanner' },
 ];
 
 const SIDEBAR_WIDTH = 260;

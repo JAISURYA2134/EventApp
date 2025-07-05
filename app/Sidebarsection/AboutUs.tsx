@@ -24,7 +24,7 @@ const vellalarCards = [
     id: 'gangai-maindhan',
     title: 'கங்கை மைந்தன் மரபாளன் காஞ்சியில் குடியேறல்',
     image: require('@/assets/images/purana.png'),
-    summary: 'கங்கை மைந்தர்கள் என அழைக்கப்படும் வேளாளர்களின் முன்னோர் மரபாளன் என வழங்கப்படுகின்றார்',
+    summary: 'கங்கை மைந்தர்கள் என அழைக்கப்படும் வேளாளர்களின் முன்னோர் மரபாளன் என வழங்கப்படுகின்றார்.',
   },
   {
     id: 'gangai-amman',
@@ -41,7 +41,8 @@ const vellalarCards = [
   {
     id: 'religion',
     title: 'வேளாளர் பெயர்க்காரணம்',
-    image: require('@/assets/images/religion.jpg'),
+    image: require('@/assets/images/lit.jpeg'),
+    summary: 'காலத்தால் முற்பட்ட தொல்காப்பியம் என்னும் தமிழ் இலக்கண நூல் தமிழகத்தில்...'
   },
   {
     id: 'sangam',
@@ -114,7 +115,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#ffffff',
     paddingTop:30,
     padding: 16,
-    paddingBottom:0,
+    marginBottom:35,
     
   },
   header: {

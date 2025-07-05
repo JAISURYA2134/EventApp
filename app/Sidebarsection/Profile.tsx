@@ -16,11 +16,12 @@ import { doc, updateDoc } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { useAppStore } from '@/lib/store';
 import * as ImagePicker from 'expo-image-picker';
-import * as FileSystem from 'expo-file-system';
+
 
 const profileSchema = z.object({
   name: z.string().min(1, 'Name is required'),
   email: z.string().email('Invalid email'),
+  phoneNumber: z.string().optional()
 });
 
 type ProfileFormData = z.infer<typeof profileSchema>;
@@ -39,6 +40,7 @@ export default function Profile() {
     defaultValues: {
       name: user?.name || '',
       email: user?.email || '',
+      phoneNumber: user?.phoneNumber || '',
     },
   });
 
@@ -46,6 +48,7 @@ export default function Profile() {
     if (user) {
       setValue('name', user.name);
       setValue('email', user.email);
+      setValue('phoneNumber', user.phoneNumber || '');
     }
   }, [user, setValue]);
 
@@ -54,8 +57,7 @@ export default function Profile() {
     try {
       const userRef = doc(db, 'users', user.id);
       await updateDoc(userRef, {
-        name: data.name,
-        email: data.email,
+        name: data.name
       });
 
       setUser({
@@ -108,7 +110,7 @@ export default function Profile() {
     <ScrollView style={styles.container}>
       {/* Profile Header */}
       <View style={[styles.card, { position: 'relative' }]}>
-        <View style={styles.badgeTopLeft}>
+        {/* <View style={styles.badgeTopLeft}>
           <Text
             style={[
               styles.badge,
@@ -117,27 +119,27 @@ export default function Profile() {
           >
             {user.isVerified ? 'Verified' : 'Not Verified'}
           </Text>
+        </View> */}
+
+        {/* Avatar Section */}
+        <View style={styles.avatarWrapper}>
+          <View style={{ position: 'relative' }}>
+            <TouchableOpacity onPress={handleImagePick} activeOpacity={0.8}>
+              <View style={styles.avatarContainer}>
+                {user.avatarUrl ? (
+                  <Image source={{ uri: user.avatarUrl }} style={styles.avatarImage} />
+                ) : (
+                  <Text style={styles.avatarText}>
+                    {user.name?.charAt(0).toUpperCase()}
+                  </Text>
+                )}
+              </View>
+            </TouchableOpacity>
+            <TouchableOpacity onPress={handleImagePick} style={styles.cameraIconContainer}>
+              <Feather name="camera" size={16} color="#fff" />
+            </TouchableOpacity>
+          </View>
         </View>
-
-        {/* Choose Image */}
-        <TouchableOpacity
-          style={styles.chooseImageButton}
-          onPress={handleImagePick}
-        >
-          <Text style={styles.chooseImageText}>Choose Image</Text>
-        </TouchableOpacity>
-
-        {/* Avatar */}
- <View style={styles.avatarContainer} key={user.avatarUrl || 'initial'}>
-  {user.avatarUrl ? (
-    <Image source={{ uri: user.avatarUrl }} style={styles.avatarImage} />
-  ) : (
-    <Text style={styles.avatarText}>
-      {user.name?.charAt(0).toUpperCase()}
-    </Text>
-  )}
-</View>
-
 
         <Text style={styles.profileName}>{user.name}</Text>
       </View>
@@ -169,23 +171,6 @@ export default function Profile() {
               <Text style={styles.error}>{errors.name.message}</Text>
             )}
 
-            <Controller
-              control={control}
-              name="email"
-              render={({ field }) => (
-                <TextInput
-                  style={styles.input}
-                  placeholder="Email"
-                  keyboardType="email-address"
-                  value={field.value}
-                  onChangeText={field.onChange}
-                />
-              )}
-            />
-            {errors.email && (
-              <Text style={styles.error}>{errors.email.message}</Text>
-            )}
-
             <View style={styles.row}>
               <TouchableOpacity
                 style={styles.saveButton}
@@ -208,6 +193,14 @@ export default function Profile() {
               <View style={styles.infoTextGroup}>
                 <Text style={styles.label}>Email</Text>
                 <Text style={styles.value}>{user.email}</Text>
+              </View>
+            </View>
+          
+               <View style={styles.infoRow}>
+              <Feather name="phone" size={20} color="#6b7280" />
+              <View style={styles.infoTextGroup}>
+                <Text style={styles.label}>Phone</Text>
+                <Text style={styles.value}>{user.phoneNumber || 'Not Provided'}</Text>
               </View>
             </View>
           </View>
@@ -243,6 +236,10 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: '600',
   },
+    avatarWrapper: {
+    alignItems: 'center',
+    marginBottom: 8,
+  },
   avatarContainer: {
     width: 80,
     height: 80,
@@ -253,6 +250,16 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
     marginBottom: 8,
     overflow: 'hidden',
+  },
+    cameraIconContainer: {
+    position: 'absolute',
+    bottom: 0,
+    right: 0,
+    backgroundColor: '#4caf50',
+    borderRadius: 16,
+    padding: 4,
+    borderWidth: 1,
+    borderColor: '#fff',
   },
   avatarText: {
     color: 'white',

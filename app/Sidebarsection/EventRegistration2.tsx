@@ -23,7 +23,7 @@ const schema = z
     name: z.string().min(1, 'பெயர் அவசியம் / Name is required'),
     birthday: z.string().min(1, 'பிறந்த தேதி/வயது அவசியம் / Birthday is required'),
     age: z.number().min(1, 'வயது தவிர்க்க முடியாது / Age is required'),
-    phoneNumber: z.string().min(10, 'தொலைபேசி எண் சரியாக உள்ளிடவும் / Enter valid phone number'),
+    phoneNumber: z.string().max(10, 'தொலைபேசி எண் சரியாக உள்ளிடவும் / Enter valid phone number'),
     email: z.string().email('சரியான மின்னஞ்சலை உள்ளிடவும் / Enter valid email'),
     fatherName: z.string().min(1, 'தந்தையார் பெயர் அவசியம் / Father name required'),
     motherName: z.string().min(1, 'தாயார் பெயர் அவசியம் / Mother name required'),
@@ -332,7 +332,7 @@ const getTodayDate = () => {
       extraScrollHeight={95}
       enableOnAndroid={true}
     >
-
+      <BackButton/>
       <Text variant="titleLarge" style={styles.title}>மாநாடு வருகைப் பதிவுப் படிவம்</Text>
 
        
